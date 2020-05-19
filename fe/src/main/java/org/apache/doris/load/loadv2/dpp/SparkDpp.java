@@ -657,7 +657,7 @@ public final class SparkDpp implements java.io.Serializable {
                 }
                 partitionRangeKey.endKeys = new DppColumns(endKeyColumns);
             } else {
-                partitionRangeKey.isMaxPartition = false;
+                partitionRangeKey.isMaxPartition = true;
             }
             partitionRangeKeys.add(partitionRangeKey);
         }
