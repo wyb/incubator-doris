@@ -1848,16 +1848,13 @@ public class Catalog {
         return checksum;
     }
 
-    public long loadResources(DataInputStream dis, long checksum) throws IOException {
+    public long loadResources(DataInputStream in, long checksum) throws IOException {
         if (MetaContext.get().getMetaVersion() >= FeMetaVersion.VERSION_85) {
-            int count = dis.readInt();
-            checksum ^= count;
-            for (long i = 0; i < count; ++i) {
-                Resource resource = Resource.read(dis);
-                resourceMgr.replayCreateResource(resource);
-            }
-            LOG.info("finished replay etlClusterMgr from image");
+            int size = in.readInt();
+            checksum = checksum ^ size;
+            resourceMgr.readFields(in);
         }
+        LOG.info("finished replay resources from image");
         return checksum;
     }
 
@@ -2185,15 +2182,11 @@ public class Catalog {
         return checksum;
     }
 
-    public long saveResources(DataOutputStream dos, long checksum) throws IOException {
-        Collection<Resource> resources = resourceMgr.getResources();
-        int size = resources.size();
+    public long saveResources(DataOutputStream out, long checksum) throws IOException {
+        int size = resourceMgr.getResourceNum();
         checksum ^= size;
-        dos.writeInt(size);
-
-        for (Resource resource : resources) {
-            resource.write(dos);
-        }
+        out.writeInt(size);
+        resourceMgr.write(out);
         return checksum;
     }
 
