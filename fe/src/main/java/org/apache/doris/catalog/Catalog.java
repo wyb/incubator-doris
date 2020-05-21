@@ -1850,8 +1850,6 @@ public class Catalog {
 
     public long loadResources(DataInputStream in, long checksum) throws IOException {
         if (MetaContext.get().getMetaVersion() >= FeMetaVersion.VERSION_85) {
-            int size = in.readInt();
-            checksum = checksum ^ size;
             resourceMgr.readFields(in);
         }
         LOG.info("finished replay resources from image");
@@ -2183,10 +2181,7 @@ public class Catalog {
     }
 
     public long saveResources(DataOutputStream out, long checksum) throws IOException {
-        int size = resourceMgr.getResourceNum();
-        checksum ^= size;
-        out.writeInt(size);
-        resourceMgr.write(out);
+        Catalog.getCurrentCatalog().getResourceMgr().write(out);
         return checksum;
     }
 
