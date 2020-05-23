@@ -1850,7 +1850,7 @@ public class Catalog {
 
     public long loadResources(DataInputStream in, long checksum) throws IOException {
         if (MetaContext.get().getMetaVersion() >= FeMetaVersion.VERSION_85) {
-            resourceMgr.readFields(in);
+            resourceMgr = ResourceMgr.read(in);
         }
         LOG.info("finished replay resources from image");
         return checksum;
