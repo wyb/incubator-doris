@@ -305,9 +305,9 @@ OLAPStatus PushHandler::_convert_v2(TabletSharedPtr cur_tablet,
 
         // 2. Init PushBrokerReader to read broker file if exist,
         //    in case of empty push this will be skipped.
+        std::string path = _request.broker_scan_range.ranges[0].path;
         LOG(INFO) << "tablet=" << cur_tablet->full_name() << ", file path=" << path
                   << ", file size=" << _request.broker_scan_range.ranges[0].file_size;
-        std::string path = _request.broker_scan_range.ranges[0].path;
         if (!path.empty()) {
             reader = new(std::nothrow) PushBrokerReader();
             if (reader == nullptr) {
