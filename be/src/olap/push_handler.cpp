@@ -305,6 +305,8 @@ OLAPStatus PushHandler::_convert_v2(TabletSharedPtr cur_tablet,
 
         // 2. Init PushBrokerReader to read broker file if exist,
         //    in case of empty push this will be skipped.
+        LOG(INFO) << "tablet=" << cur_tablet->full_name() << ", file path=" << path
+                  << ", file size=" << _request.broker_scan_range.ranges[0].file_size;
         std::string path = _request.broker_scan_range.ranges[0].path;
         if (!path.empty()) {
             reader = new(std::nothrow) PushBrokerReader();
@@ -338,7 +340,7 @@ OLAPStatus PushHandler::_convert_v2(TabletSharedPtr cur_tablet,
 
             // 4. Read data from broker and write into SegmentGroup of cur_tablet
             // Convert from raw to delta
-            VLOG(3) << "start to convert row file to delta.";
+            VLOG(3) << "start to convert etl file to delta.";
             while (!reader->eof()) {
                 res = reader->next(&row);
                 if (OLAP_SUCCESS != res) {
@@ -360,6 +362,7 @@ OLAPStatus PushHandler::_convert_v2(TabletSharedPtr cur_tablet,
                 }
             }
 
+            reader->print_profile();
             reader->finalize();
         }
 
@@ -1024,6 +1027,12 @@ OLAPStatus PushBrokerReader::next(ContiguousRow* row) {
     }
 
 	return OLAP_SUCCESS;
+}
+
+void PushBrokerReader::print_profile() {
+    std::stringstream ss;
+    _runtime_profile->pretty_print(&ss);
+    LOG(INFO) << ss.str();
 }
 
 string PushHandler::_debug_version_list(const Versions& versions) const {

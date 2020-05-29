@@ -221,14 +221,13 @@ public:
     PushBrokerReader() 
         : _ready(false),
           _eof(false) {}
-    ~PushBrokerReader() {
-        finalize();
-    }
+    ~PushBrokerReader() {}
 
     OLAPStatus init(const Schema* schema,
                     const TBrokerScanRange& t_scan_range,
                     const TDescriptorTable& t_desc_tbl);
     OLAPStatus next(ContiguousRow* row);
+    void print_profile();
 
     OLAPStatus finalize() {
         _ready = false;
